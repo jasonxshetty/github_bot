@@ -9,8 +9,8 @@ creates, deletes, and manages collaborators
 ##setup and run
 1. clone repo\
    bash:
-   git clone https://github.com/jasonxshetty/github-bot.git\
-   cd github-management
+   git clone https://github.com/jasonxshetty/github-bot.git
+   \cd github-management
 2. install dependencies\
     bash: npm install
 3. create .env\
