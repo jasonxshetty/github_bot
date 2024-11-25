@@ -10,7 +10,7 @@ creates, deletes, and manages collaborators
 1. clone repo\
    bash:
    git clone https://github.com/jasonxshetty/github-bot.git
-   \cd github-management
+   cd github-management
 2. install dependencies\
     bash: npm install
 3. create .env\
