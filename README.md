@@ -1,6 +1,6 @@
 # github management program
 
-creates, deletes, and manages collaborators
+creates, deletes, and manages collaborators/repos
 
 ##requirements
 - node.js v14+
