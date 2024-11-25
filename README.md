@@ -8,19 +8,19 @@ creates, deletes, and manages collaborators
 
 ##setup and run
 1. clone repo
-   '''bash
+   bash:
    git clone https://github.com/jasonxshetty/github-bot.git
    cd github-management
 2. install dependencies
-   '''bash
+   bash:
    npm install
 3. create .env
-   '''bash
+   bash:
    cp .env.example .env
 4. edit "your_personal_access_token" to you token in .env file
 5. compile typescript
-   '''bash
+   bash:
    tsc
 6. run
-   '''bash
+   bash:
    node dist/GithubManagement.js
