@@ -13,6 +13,6 @@
     "allowSyntheticDefaultImports": true,              /* Allow default imports from CommonJS modules */
     "isolatedModules": true                             /* Ensure safe transpilation of each file independently */
   },
-  "include": ["./*.ts"],                                 /* Include all TypeScript files in the project root */
+  "include": ["./*.ts", "src/GithubManagement.ts"],                                 /* Include all TypeScript files in the project root */
   "exclude": ["node_modules", "dist"]                   /* Exclude node_modules and the output directory */
 }
