@@ -1,20 +1,9 @@
 import { Octokit } from "@octokit/rest";
 import * as dotenv from "dotenv";
+import * as fs from "fs";
 import * as readline from "readline";
 
 dotenv.config();
-
-// Helper function to get user input from the terminal
-const prompt = (query: string): Promise<string> => {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  return new Promise((resolve) => rl.question(query, (ans) => {
-    rl.close();
-    resolve(ans);
-  }));
-};
 
 class GitHubManager {
   private octokit: Octokit;
@@ -27,7 +16,7 @@ class GitHubManager {
     this.octokit = new Octokit({ auth: token });
   }
 
-  // Fetch authenticated user's username
+  // get authenticated user's username
   async getAuthenticatedUsername(): Promise<string> {
     try {
       const response = await this.octokit.users.getAuthenticated();
@@ -35,6 +24,24 @@ class GitHubManager {
     } catch (error) {
       console.error("Error fetching authenticated username:", error);
       throw error;
+    }
+  }
+
+  // Check if a repository exists
+  async repositoryExists(owner: string, repoName: string): Promise<boolean> {
+    try {
+      await this.octokit.repos.get({
+        owner,
+        repo: repoName,
+      });
+      return true;
+    } catch (error: any) {
+      if (error.status === 404) {
+        return false;
+      } else {
+        console.error("Error checking repository existence:", error);
+        throw error;
+      }
     }
   }
 
@@ -51,19 +58,6 @@ class GitHubManager {
     }
   }
 
-  // Delete a repository
-  async deleteRepository(owner: string, repoName: string): Promise<void> {
-    try {
-      await this.octokit.repos.delete({
-        owner,
-        repo: repoName,
-      });
-      console.log(`Repository deleted: ${owner}/${repoName}`);
-    } catch (error) {
-      console.error("Error deleting repository:", error);
-    }
-  }
-
   // Add a collaborator to a repository
   async addUserToRepository(owner: string, repoName: string, username: string): Promise<void> {
     try {
@@ -75,7 +69,7 @@ class GitHubManager {
       });
       console.log(`User ${username} added to ${owner}/${repoName} with push permission.`);
     } catch (error) {
-      console.error("Error adding user to repository:", error);
+      console.error(`Error adding user ${username} to repository:`, error);
     }
   }
 
@@ -89,10 +83,36 @@ class GitHubManager {
       });
       console.log(`User ${username} removed from ${owner}/${repoName}.`);
     } catch (error) {
-      console.error("Error removing user from repository:", error);
+      console.error(`Error removing user ${username} from repository:`, error);
+    }
+  }
+
+  // List collaborators of a repository
+  async listCollaborators(owner: string, repoName: string): Promise<string[]> {
+    try {
+      const response = await this.octokit.repos.listCollaborators({
+        owner,
+        repo: repoName,
+      });
+      return response.data.map((collaborator) => collaborator.login);
+    } catch (error) {
+      console.error("Error listing collaborators:", error);
+      throw error;
     }
   }
 }
+
+// Helper function to prompt for file path
+const promptFilePath = async (query: string): Promise<string> => {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  return new Promise((resolve) => rl.question(query, (ans) => {
+    rl.close();
+    resolve(ans);
+  }));
+};
 
 // Main Function
 (async () => {
@@ -101,49 +121,68 @@ class GitHubManager {
 
   console.log(`Authenticated as: ${username}`);
 
-  const actionInput = await prompt("What do you want to do? (create/edit repository): ");
-  const action = actionInput.toLowerCase();
+  const filePath = await promptFilePath("Enter the JSON file path: ");
 
-  if (action === "create") {
-    const repoName = await prompt("Enter the name of the new repository: ");
-    await manager.createRepository(repoName, true);
+  // Read and parse the JSON file
+  let teamData;
+  try {
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    teamData = JSON.parse(fileContent);
+  } catch (error) {
+    console.error("Error reading or parsing JSON file:", error);
+    return;
+  }
 
-    while (true) {
-      const collaborator = await prompt("Enter a collaborator's username (or press Enter to finish): ");
-      if (!collaborator) break; // Exit the loop if no input
-      await manager.addUserToRepository(username, repoName, collaborator);
+  const { teamName, collaborators } = teamData;
+
+  if (!teamName || !Array.isArray(collaborators)) {
+    console.error("Invalid JSON format. Please provide 'teamName' and 'collaborators' array.");
+    return;
+  }
+
+  const repoExists = await manager.repositoryExists(username, teamName);
+
+  if (repoExists) {
+    console.log(`Repository '${teamName}' exists. Updating collaborators...`);
+
+    // Get current collaborators
+    const currentCollaborators = await manager.listCollaborators(username, teamName);
+
+    // Normalize usernames to lowercase for case-insensitive comparison
+    const normalizedCurrentCollaborators = currentCollaborators.map((collab) => collab.toLowerCase());
+    const normalizedCollaborators = collaborators.map((collab: string) => collab.toLowerCase());
+    const normalizedUsername = username.toLowerCase();
+
+    // Determine collaborators to add and remove
+    const collaboratorsToAdd = normalizedCollaborators.filter(
+      (collab) => !normalizedCurrentCollaborators.includes(collab)
+    );
+    const collaboratorsToRemove = normalizedCurrentCollaborators.filter(
+      (collab) => !normalizedCollaborators.includes(collab) && collab !== normalizedUsername // Do not remove the repo owner
+    );
+
+    // Add new collaborators
+    for (const collab of collaboratorsToAdd) {
+      await manager.addUserToRepository(username, teamName, collab);
     }
 
-  } else if (action === "edit") {
-    const repoName = await prompt("Enter the name of the repository to edit: ");
-    const editActionInput = await prompt("What do you want to do? (add/remove collaborator or delete): ");
-    const editAction = editActionInput.toLowerCase();
-
-    if (editAction === "add") {
-      while (true) {
-        const collaborator = await prompt("Enter a collaborator's username (or press Enter to finish): ");
-        if (!collaborator) break; // Exit the loop if no input
-        await manager.addUserToRepository(username, repoName, collaborator);
-      }
-    } else if (editAction === "remove") {
-      while (true) {
-        const collaborator = await prompt("Enter the collaborator's username to remove (or press Enter to finish): ");
-        if (!collaborator) break; // Exit the loop if no input
-        await manager.removeUserFromRepository(username, repoName, collaborator);
-      }
-    } else if (editAction === "delete") {
-      const confirm = await prompt("Are you sure you want to delete this repository? (yes/no): ");
-      if (confirm.toLowerCase() === "yes") {
-        await manager.deleteRepository(username, repoName);
-      } else {
-        console.log("Repository deletion canceled.");
-      }
-    } else {
-      console.log("Invalid action. Please try again.");
+    // Remove collaborators not in the JSON file
+    for (const collab of collaboratorsToRemove) {
+      await manager.removeUserFromRepository(username, teamName, collab);
     }
+
+    console.log("Collaborators updated.");
 
   } else {
-    console.log("Invalid option. Please try again.");
+    console.log(`Repository '${teamName}' does not exist. Creating repository and adding collaborators...`);
+    await manager.createRepository(teamName, true);
+
+    // Add collaborators
+    for (const collab of collaborators) {
+      await manager.addUserToRepository(username, teamName, collab);
+    }
+
+    console.log("Repository created and collaborators added.");
   }
 
   console.log("Program completed.");
