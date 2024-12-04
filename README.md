@@ -20,3 +20,6 @@ creates, deletes, and manages collaborators/repos
     bash: tsc
 7. run\
     bash: node dist/GithubManagement.js
+
+Documentation:
+   
