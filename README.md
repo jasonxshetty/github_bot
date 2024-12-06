@@ -19,7 +19,4 @@ creates, deletes, and manages collaborators/repos
 5. compile typescript\
     bash: tsc
 7. run\
-    bash: node dist/GithubManagement.js
-
-Documentation:
-   
+    bash: node dist/GithubManagement.js   
