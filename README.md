@@ -2,11 +2,11 @@
 
 creates, deletes, and manages collaborators/repos
 
-##requirements
+## requirements
 - node.js v14+
 - github access token with admin and repo permissions
 
-##setup and run
+## setup and run
 1. clone repo\
    bash:
    git clone https://github.com/jasonxshetty/github-bot.git
