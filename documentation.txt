@@ -1,1 +1,4 @@
-
+create repo in python
+changed to ts
+delete repo
+check repo 
