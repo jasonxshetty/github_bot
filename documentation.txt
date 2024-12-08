@@ -1,4 +1,26 @@
-create repo in python
-changed to ts
-delete repo
-check repo 
+createRepository(repoName, isPrivate=true)(10/11/24) - takes in the repoName and the isPrivate variable and creates the repository as well as displaying a message if it was created and if it wasn't created. This is the first method we made and tested to see if the repository was created or not. 
+repositoryExists(owner,repoName)(10/18/24) - Takes in the owner and repoName and checks if the repo already exists on github and returns true or false based on the result. Throws error 404 for issues
+getAuthenticatedUsername()(10/18/24)- gets the authenticated username of the github user and returns it. Throws an error if its unable to find the username.
+addUserToRepository(owner,repoName,username)(10/25/24) - adds a collaborater to a repository given the parameters which are the owner, repoName, and userName.
+removeUserFromRepository(owner, repoName, username)(11/2/24) - removes the collaborater from a repository given the owner, repoName and userName
+listCollaboraters(owner,repoName)(11/9/24) - Lists the current collaboraters in a given repository
+promptFilePath(query)(11/9/24) - Prompts the user to input a file path given the query
+
+Mainfunction - authenticates the user with the Github API and then reads and parses the JSON file. Then calls the repoExits method to check if the repository exists.If the repository exists, collaboraters are updated by adding in the new members and removing the ones that arent in the JSON file. If the repository doesnt already exist, a private repository is created and adds the students listed in the JSON file to the collaboraters of the repository.
+
+
+
+
+
+Challenges we Faced:
+Some challenges we faced was trying to convert our already written python script to typescript because none of use knew typescript and that made the process of writing the script much longer than I expected.
+Difficulty in developing and implementing the algorithm for adding and removing students based on the project status.
+
+
+
+What we learned:
+How Typscript works with the github bot script
+
+
+
+
