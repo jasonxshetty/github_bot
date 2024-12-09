@@ -13,13 +13,14 @@ Mainfunction - authenticates the user with the Github API and then reads and par
 
 
 Challenges we Faced:
-Some challenges we faced was trying to convert our already written python script to typescript because none of use knew typescript and that made the process of writing the script much longer than I expected.
+Some challenges we faced was trying to convert our already written python script to typescript because none of use knew typescript and that made the process of writing the script much longer than expected.
 Difficulty in developing and implementing the algorithm for adding and removing students based on the project status.
-
+Staying consistent in development. Overall making sure we were on track and not behind in the agenda.
 
 
 What we learned:
-How Typscript works with the github bot script
+We learned how to work in a team enviroment to develop a product which has a real time usage which makes a difference. All of us learned more and refined our skills in typescript. 
+How Typscript works with the github bot script.
 
 
 
