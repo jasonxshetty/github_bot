@@ -6,7 +6,7 @@ removeUserFromRepository(owner, repoName, username)(11/2/24) - removes the colla
 listCollaboraters(owner,repoName)(11/9/24) - Lists the current collaboraters in a given repository
 promptFilePath(query)(11/9/24) - Prompts the user to input a file path given the query
 
-Mainfunction - authenticates the user with the Github API and then reads and parses the JSON file. Then calls the repoExits method to check if the repository exists.If the repository exists, collaboraters are updated by adding in the new members and removing the ones that arent in the JSON file. If the repository doesnt already exist, a private repository is created and adds the students listed in the JSON file to the collaboraters of the repository.
+Mainfunction(11/22/24) - authenticates the user with the Github API and then reads and parses the JSON file. Then calls the repoExits method to check if the repository exists.If the repository exists, collaboraters are updated by adding in the new members and removing the ones that arent in the JSON file. If the repository doesnt already exist, a private repository is created and adds the students listed in the JSON file to the collaboraters of the repository.
 
 
 
